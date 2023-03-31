@@ -112,7 +112,12 @@ int main()
         shape.setPosition(sf::Vector2f(x, y));
 
         // update bullets
-        for (auto b : bullets) { b->Update(); }
+        int i = 0;
+        for (auto b : bullets) { 
+            b->Update(); 
+            if (b->lifetime < 0) bullets.erase(bullets.begin() + i);
+            i++;
+        }
 
         // draw
         window.clear();

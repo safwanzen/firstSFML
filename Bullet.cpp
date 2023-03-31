@@ -1,13 +1,17 @@
 #include "Bullet.h"
+#include <iostream>
 
 Bullet::Bullet()
 {
+	ID++;
 }
 
 Bullet::~Bullet()
 {
 	delete circle;
 }
+
+unsigned int Bullet::ID = 0;
 
 Bullet::Bullet(float x, float y, float vx, float vy)
 {
@@ -24,6 +28,8 @@ Bullet::Bullet(float x, float y, float vx, float vy)
 void Bullet::Update() {
 	x += vx;
 	y += vy;
+	lifetime--;
+	std::cout << "bullet " << ID << " life " << lifetime << "\n";
 }
 
 void Bullet::Draw(sf::RenderWindow& window)
