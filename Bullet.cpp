@@ -11,9 +11,7 @@ Bullet::~Bullet()
 	delete circle;
 }
 
-unsigned int Bullet::ID = 0;
-
-Bullet::Bullet(float x, float y, float vx, float vy)
+Bullet::Bullet(float x, float y, float vx, float vy, uint32_t id)
 {
 	circle = new sf::CircleShape(5);
 	circle->setOrigin(5, 5);
@@ -23,6 +21,7 @@ Bullet::Bullet(float x, float y, float vx, float vy)
 	this->y = y;
 	this->vx = vx;
 	this->vy = vy;
+	ID = id;
 }
 
 void Bullet::Update() {

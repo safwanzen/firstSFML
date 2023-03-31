@@ -2,6 +2,9 @@
 #include <iostream>
 #include <math.h>
 #include "Bullet.h"
+#include "Vector.h"
+
+#define PI 3.1425
 
 float radius = 10.f;
 constexpr sf::Int64 ticktimems = 1000000 / 60;
@@ -13,10 +16,14 @@ float ax = 0.f, ay = 0.f;
 float a = .5f;
 float maxv = 5.f;
 
+Vector acc;
+Vector vel;
+
 bool u = false, d = false, l = false, r = false;
 float dir = 0;
 bool drag = false;
 float bulletspeed = 10;
+uint32_t bulletID = 0;
 
 std::vector<Bullet*> bullets;
 
@@ -27,7 +34,8 @@ float distance(sf::Vector2f v1, sf::Vector2f v2) {
 }
 
 void fire(float xpos, float ypos, float vx = 0, float vy = 0) {
-    bullets.push_back(new Bullet(xpos, ypos, vx, vy));
+    bullets.push_back(new Bullet(xpos, ypos, vx, vy, bulletID));
+    bulletID++;
 }
 
 int main()
@@ -89,7 +97,7 @@ int main()
 
         // update
         if (!drag) {
-            if (u) vy -= a;
+            /*if (u) vy -= a;
             if (d) vy += a;
             if (l) vx -= a;
             if (r) vx += a;
@@ -97,10 +105,27 @@ int main()
             if (vx > maxv) vx = maxv;
             if (vy > maxv) vy = maxv;
             if (vx < -maxv) vx = -maxv;
-            if (vy < -maxv) vy = -maxv;
+            if (vy < -maxv) vy = -maxv;*/
 
-            x += vx;
-            y += vy;
+            Vector aa;
+            aa.setLength(2);
+            if (u) aa.setAngle(PI * 1.5);
+            else if (d) aa.setAngle(PI * .5);
+            else if (l) aa.setAngle(PI);
+            else if (r) aa.setAngle(0);
+
+            if (u && r) aa.setAngle(PI * 1.75);
+            else if (u && l) aa.setAngle(PI * 1.25);
+            else if (d && r) aa.setAngle(PI * .25);
+            else if (d && l) aa.setAngle(PI * .75);
+            
+            if (!u && !d && !l && !r) aa.setLength(0);
+
+            vel.add(aa);
+            if (vel.getLength() > 5) vel.setLength(5);
+
+            x += vel.x;
+            y += vel.y;
         }
         else {
             vx = vy = 0;
