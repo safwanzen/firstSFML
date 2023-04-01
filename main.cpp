@@ -80,12 +80,8 @@ int main()
                     float dist = distance(mousepos, shape.getPosition());
                     float dirx = dir.x / dist * bulletspeed;
                     float diry = dir.y / dist * bulletspeed;
-                    fire((float)x, (float)y, dirx, diry);
-                    //fire(event.mouseButton.x, event.mouseButton.y, dir.x, dir.y);
-                    /*sf::Vector2f mousepos(event.mouseButton.x, event.mouseButton.y);
-                    float dist = distance(mousepos, shape.getPosition());
-                    std::cout << "distance -> " << dist << "\n";
-                    if (dist < radius + 4.f) { drag = true; }*/
+                    if (dist < radius + 4.f) { drag = true; }
+                    else fire((float)x, (float)y, dirx, diry);
                 }
             }
             else if (event.type == sf::Event::MouseButtonReleased) {
@@ -97,16 +93,6 @@ int main()
 
         // update
         if (!drag) {
-            /*if (u) vy -= a;
-            if (d) vy += a;
-            if (l) vx -= a;
-            if (r) vx += a;
-
-            if (vx > maxv) vx = maxv;
-            if (vy > maxv) vy = maxv;
-            if (vx < -maxv) vx = -maxv;
-            if (vy < -maxv) vy = -maxv;*/
-
             Vector aa;
             aa.setLength(2);
             if (u) aa.setAngle(PI * 1.5);
@@ -128,7 +114,7 @@ int main()
             y += vel.y;
         }
         else {
-            vx = vy = 0;
+            vel.setLength(0);
             auto pos = sf::Mouse::getPosition(window);
             x = pos.x;
             y = pos.y;
