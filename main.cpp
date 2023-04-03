@@ -112,6 +112,12 @@ int main()
 
             x += vel.x;
             y += vel.y;
+
+            // apply deceleration
+            float _v = vel.getLength();
+            _v -= 0.2;
+            vel.setLength(_v);
+            if (vel.getLength() < 0.6) vel.setLength(0);
         }
         else {
             vel.setLength(0);
