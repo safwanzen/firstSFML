@@ -49,6 +49,23 @@ int main()
     shape.setOrigin(radius, radius);
     shape.setFillColor(sf::Color::Green);
 
+    int sw = 39;
+    int sh = 49;
+    float rectx = 0, recty = 0;
+
+    sf::Texture tx;
+    sf::Image img;
+    if (!img.loadFromFile("Untitledzz.png")) return EXIT_FAILURE;
+    img.createMaskFromColor(sf::Color(32, 128, 192));
+    tx.loadFromImage(img);
+    //tx.create(sw, sh);
+    sf::Sprite sprite(tx);
+    sprite.setTextureRect(sf::IntRect(sf::Vector2i(rectx * sw, recty), sf::Vector2i(sw, sh)));
+    sprite.setOrigin(19, 25);
+    sprite.setPosition(200, 200);
+    int flip = 1;
+    sprite.setScale(flip, 1);
+
     while (window.isOpen())
     {
         auto start = clock.getElapsedTime();
@@ -90,15 +107,21 @@ int main()
                 }
             }
         }
-
+        
         // update
         if (!drag) {
             Vector aa;
             aa.setLength(2);
             if (u) aa.setAngle(PI * 1.5);
             else if (d) aa.setAngle(PI * .5);
-            else if (l) aa.setAngle(PI);
-            else if (r) aa.setAngle(0);
+            else if (l) { 
+                flip = -1; 
+                aa.setAngle(PI); 
+            }
+            else if (r) {
+                flip = 1; 
+                aa.setAngle(0);
+            }
 
             if (u && r) aa.setAngle(PI * 1.75);
             else if (u && l) aa.setAngle(PI * 1.25);
@@ -127,6 +150,17 @@ int main()
         }
 
         shape.setPosition(sf::Vector2f(x, y));
+        sprite.setScale(flip, 1);
+        sprite.setPosition(x, 200);
+
+        // update rect
+        if (vel.getLength() > 0) {
+            rectx += 0.1;
+            if (rectx > 4) rectx = 0;
+        }
+        else rectx = 4;
+
+        sprite.setTextureRect(sf::IntRect(sf::Vector2i((int)rectx * sw, recty), sf::Vector2i(sw, sh)));
 
         // update bullets
         int i = 0;
@@ -138,6 +172,7 @@ int main()
 
         // draw
         window.clear();
+        window.draw(sprite);
         window.draw(shape);
         for (auto b : bullets) { b->Draw(window); }
         window.display();
