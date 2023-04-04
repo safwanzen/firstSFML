@@ -3,12 +3,14 @@
 #include <math.h>
 #include "Bullet.h"
 #include "Vector.h"
+#include "GameObject.h"
 
 #define PI 3.1425
 
 float radius = 10.f;
 constexpr sf::Int64 ticktimems = 1000000 / 60;
 unsigned int width = 500, height = 500;
+sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!");
 
 float x = 100, y = 100;
 float vx = 0.f, vy = 0.f;
@@ -27,6 +29,8 @@ uint32_t bulletID = 0;
 
 std::vector<Bullet*> bullets;
 
+void DrawObject(GameObject g);
+
 float distance(sf::Vector2f v1, sf::Vector2f v2) {
     auto diff = v2 - v1;
     float dist = std::sqrt(diff.y * diff.y + diff.x * diff.x);
@@ -41,8 +45,6 @@ void fire(float xpos, float ypos, float vx = 0, float vy = 0) {
 int main()
 {
     sf::CircleShape shape(radius);
-
-    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!");
 
     sf::Clock clock;
 
@@ -65,6 +67,28 @@ int main()
     sprite.setPosition(200, 200);
     int flip = 1;
     sprite.setScale(flip, 1);
+
+    int sbw = 75;
+    int sbh = 30;
+    float rectbx = 0, rectby = 0;
+    bool playsaber = false;
+    sf::Texture txsaber;
+    sf::Image imgsaber;
+    if (!imgsaber.loadFromFile("Untitledsaber.png")) return EXIT_FAILURE;
+    imgsaber.createMaskFromColor(sf::Color(32, 128, 192));
+    txsaber.loadFromImage(imgsaber);
+    //tx.create(sw, sh);
+    sf::Sprite spritesaber(txsaber);
+    spritesaber.setTextureRect(sf::IntRect(sf::Vector2i((int)rectbx * sbw, rectby), sf::Vector2i(sbw, sbh)));
+    spritesaber.setOrigin(32, 15);
+    spritesaber.setPosition(200, 200);
+    spritesaber.setScale(flip, 1);
+
+    GameObject zero;
+    zero.texture->loadFromImage(img);
+    zero.drawable = new sf::Sprite(*zero.texture);
+    
+    sf::ConvexShape polygon;
 
     while (window.isOpen())
     {
@@ -92,6 +116,8 @@ int main()
             }
             else if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
+                    playsaber = true;
+                    rectbx = 0;
                     sf::Vector2f mousepos(event.mouseButton.x, event.mouseButton.y);
                     sf::Vector2f dir = mousepos - shape.getPosition();
                     float dist = distance(mousepos, shape.getPosition());
@@ -149,18 +175,30 @@ int main()
             y = pos.y;
         }
 
-        shape.setPosition(sf::Vector2f(x, y));
+        shape.setPosition(x, y);
         sprite.setScale(flip, 1);
         sprite.setPosition(x, 200);
 
         // update rect
-        if (vel.getLength() > 0) {
+        if (vel.getLength() > 0 || l || r) {
             rectx += 0.1;
             if (rectx > 4) rectx = 0;
         }
         else rectx = 4;
 
         sprite.setTextureRect(sf::IntRect(sf::Vector2i((int)rectx * sw, recty), sf::Vector2i(sw, sh)));
+
+        // update saber
+        if (playsaber) {
+            rectbx += 0.5;
+            if (rectbx > 7) {
+                rectbx = 0;
+                playsaber = false;
+            }
+            spritesaber.setPosition(x, 195);
+            spritesaber.setScale(flip, 1);
+            spritesaber.setTextureRect(sf::IntRect(sf::Vector2i((int)rectbx * sbw, rectby), sf::Vector2i(sbw, sbh)));
+        }
 
         // update bullets
         int i = 0;
@@ -170,10 +208,23 @@ int main()
             i++;
         }
 
+        // polygon
+        /*
+        polygon.setPointCount(3);
+        polygon.setPoint(0, sf::Vector2f(0, 0));
+        polygon.setPoint(1, sf::Vector2f(0, 10));
+        polygon.setPoint(2, sf::Vector2f(25, 5));
+        polygon.setOutlineColor(sf::Color::Green);
+        polygon.setFillColor(sf::Color::Green);
+        polygon.setOutlineThickness(2);
+        polygon.setPosition(300, 300);*/
+
         // draw
         window.clear();
         window.draw(sprite);
+        if (playsaber) window.draw(spritesaber);
         window.draw(shape);
+        window.draw(polygon);
         for (auto b : bullets) { b->Draw(window); }
         window.display();
 
@@ -188,10 +239,6 @@ int main()
     return 0;
 }
 
-void update(sf::RenderWindow& window, float deltaTime) {
-    
-}
-
-void bounceToRandomDir() {
-
+void DrawObject(GameObject obj) {
+    window.draw(*obj.drawable);
 }
