@@ -20,8 +20,8 @@ int combo = 0;
 
 float radius = 10.f;
 constexpr sf::Int64 ticktimems = 1000000 / 60;
-unsigned int width = 500, height = 500;
-sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!");
+unsigned int width = 320, height = 240;
+sf::RenderWindow window(sf::VideoMode(width, height), "testo");
 
 float x = 100, y = 100;
 float vx = 0.f, vy = 0.f;
@@ -121,6 +121,18 @@ int main()
 	spritesaberc2.setPosition(200, 200);
 	spritesaberc2.setScale(flip, 1);
 
+	// combo 3
+	sf::Texture txsaberc3;
+	if (!imgsaber.loadFromFile("sprites/Untitledc3_11f.png")) return EXIT_FAILURE;
+	imgsaber.createMaskFromColor(sf::Color(32, 128, 192));
+	txsaberc3.loadFromImage(imgsaber);
+	//tx.create(sw, sh);
+	sf::Sprite spritesaberc3(txsaberc3);
+	spritesaberc3.setTextureRect(sf::IntRect(sf::Vector2i((int)rectbx * 80, rectby), sf::Vector2i(80, 59)));
+	spritesaberc3.setOrigin(20, 34);
+	spritesaberc3.setPosition(200, 200);
+	spritesaberc3.setScale(flip, 1);
+
 	GameObject zero;
 	zero.texture->loadFromImage(img);
 	zero.drawable = new sf::Sprite(*zero.texture);
@@ -153,10 +165,18 @@ int main()
 			}
 			else if (event.type == sf::Event::MouseButtonPressed) {
 				if (event.mouseButton.button == sf::Mouse::Left) {
-					if (combo < 1 && action == STANDING_SLASH) combo++;
+					if (action == STANDING_SLASH) {
+						if (combo == 0 && rectbx > 2) {
+							combo++;
+							rectbx = 0;
+						}
+						else if (combo == 1 && rectbx > 3) {
+							combo++;
+							rectbx = 0;
+						}
+					}
 					if (action == STANDING) action = STANDING_SLASH;
 					if (action == RUNNING) runningSlash = true;
-					rectbx = 0;
 					/*sf::Vector2f mousepos(event.mouseButton.x, event.mouseButton.y);
 					sf::Vector2f dir = mousepos - shape.getPosition();
 					float dist = distance(mousepos, shape.getPosition());
@@ -164,6 +184,12 @@ int main()
 					float diry = dir.y / dist * bulletspeed;
 					if (dist < radius + 4.f) { drag = true; }
 					else fire((float)x, (float)y, dirx, diry);*/
+				}
+				else if (event.mouseButton.button == sf::Mouse::Right) {
+					if (action == STANDING_SLASH && combo == 1 && rectbx > 3) {
+						combo = 3; // rising slash
+						rectbx = 0;
+					}
 				}
 			}
 			else if (event.type == sf::Event::MouseButtonReleased) {
@@ -251,6 +277,17 @@ int main()
 				spritesaberc2.setScale(flip, 1);
 				spritesaberc2.setTextureRect(sf::IntRect(sf::Vector2i((int)rectbx * 66, rectby), sf::Vector2i(66, 48)));
 			}
+			else if (combo == 2) {
+				rectbx += 0.48;
+				if (rectbx > 11) {
+					rectbx = 0;
+					combo = 0;
+					action = State::STANDING;
+				}
+				spritesaberc3.setPosition(x, 195);
+				spritesaberc3.setScale(flip, 1);
+				spritesaberc3.setTextureRect(sf::IntRect(sf::Vector2i((int)rectbx * 80, rectby), sf::Vector2i(80, 59)));
+			}
 		}
 
 		else if (runningSlash)
@@ -290,6 +327,7 @@ int main()
 		if (action == State::STANDING) window.draw(sprite);
 		else if (action == State::STANDING_SLASH && combo == 0) window.draw(spritesaberc1);
 		else if (action == State::STANDING_SLASH && combo == 1) window.draw(spritesaberc2);
+		else if (action == State::STANDING_SLASH && combo == 2) window.draw(spritesaberc3);
 		if (runningSlash) window.draw(spritesaber);
 		//window.draw(shape);
 		//window.draw(polygon);
