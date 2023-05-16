@@ -1,5 +1,5 @@
 # firstSFML
-Learning SFML
+Learning SFML. Sprites are taken from Megaman Zero
 
 Controls:
 - A D button to move left/right
